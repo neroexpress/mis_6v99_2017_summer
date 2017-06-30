@@ -2,10 +2,10 @@
 
 flight_schedule = [['T1', 'AUS', 'DAL', '0600', '0650'],
                    ['T2', 'DAL', 'HOU', '0600', '0705'],
-                   ['T3', 'HOU', 'DAL', '0600', '0705'],
-                   ['T4', 'DAL', 'AUS', '0600', '0650'],
-                   ['T5', 'HOU', 'AUS', '0600', '0645'],
-                   ['T6', 'AUS', 'HOU', '0600', '0645']]
+                   ['T3', 'DAL', 'HOU', '0600', '0705'],
+                   ['T4', 'HOU', 'AUS', '0600', '0645'],
+                   ['T5', 'HOU', 'DAL', '0600', '0705'],
+                   ['T6', 'HOU', 'DAL', '0600', '0705']]
 
 csv_header = 'tail_number,origin,destination,departure_time,arrival_time' 
 file_name = 'flight_schedule.csv'
