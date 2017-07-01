@@ -27,23 +27,22 @@ def MinutesSinceMidnight(time):
 def MilitaryTime(time):
     return (time//60)*100 + time%60
 
-def CalculateArrivalTime(origin,destination,departureTime):
-    return MilitaryTime(fly_time(origin,destination)+MinutesSinceMidnight(departureTime))
+'''def CalculateArrivalTime(origin,destination,departureTime):
+    return MilitaryTime(fly_time(origin,destination)+MinutesSinceMidnight(departureTime))'''
+
+'''def CalculateDepartureTime(origin,arrivalTime):
+    return MilitaryTime(MinutesSinceMidnight(arrivalTime) + CalculateGroundTime(origin))'''
 
 def CalculateGroundTime(origin):
     if origin == 'AUS':return 25
     elif origin == 'DAL':return 30
-    elif origin == 'HOU':return 35
-
-def CalculateDepartureTime(origin,arrivalTime):
-    return MilitaryTime(MinutesSinceMidnight(arrivalTime) + CalculateGroundTime(origin))   
+    elif origin == 'HOU':return 35  
 
 class Airport_Status:
     def __init__(self,airportName,noOfGates,gateStatus):
         self.airportName = airportName
         self.noOfGates = noOfGates
         self.gateStatus = gateStatus
-
 
 class Flight_Status:
     def __init__(self,tailNumber,currentAirport,time,updated):
@@ -88,9 +87,6 @@ def update_leftout_flight(fl):
 	fl.time = str(MilitaryTime(MinutesSinceMidnight(int(fl.time)) + \
                                     2*CalculateGroundTime(fl.currentAirport))).rjust(4,'0')
 	fl.updated = True
-	pass
-
-flt_schedule = list()
 
 AUS = Airport_Status('AUS',1,[['0600','2200']])
 DAL = Airport_Status('DAL',2,[['0600','2200'],['0600','2200']])
@@ -107,7 +103,9 @@ t6 = Flight_Status('T6','HOU','0600',True)
 
 Flights = [t4,t5,t6,t1,t2,t3]
 
-def create_schedule(Flights,Airports):
+flt_schedule = list()
+
+def create_flight_schedule(Flights,Airports):
 	j=14
 	while j>=0:
 		for fl in Flights:
@@ -138,7 +136,7 @@ def create_schedule(Flights,Airports):
     #print(flt_schedule)
 	print_flight_schedule(file_name, csv_header, flt_schedule)
 
-create_schedule(Flights,Airports)
+create_flight_schedule(Flights,Airports)
 
                                      
 
