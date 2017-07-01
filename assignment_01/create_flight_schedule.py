@@ -46,10 +46,11 @@ class Airport_Status:
 
 
 class Flight_Status:
-    def __init__(self,tailNumber,currentAirport,time):
+    def __init__(self,tailNumber,currentAirport,time,updated):
         self.tailNumber = tailNumber
         self.currentAirport = currentAirport
         self.time = time
+        self.updated = True
 
 def check_Availability(origin,destination,time,Airports):
     time = int(time)
@@ -80,7 +81,14 @@ def update_flight_status(fl,airportName,fly_time):
     fl.currentAirport = airportName
     fl.time = str(MilitaryTime(MinutesSinceMidnight(int(fly_time)) + \
                                     CalculateGroundTime(airportName))).rjust(4,'0')
+    fl.updated = True
     #print(fl.time)
+
+def update_leftout_flight(fl):
+	fl.time = str(MilitaryTime(MinutesSinceMidnight(int(fl.time)) + \
+                                    2*CalculateGroundTime(fl.currentAirport))).rjust(4,'0')
+	fl.updated = True
+	pass
 
 flt_schedule = list()
 
@@ -90,12 +98,12 @@ HOU = Airport_Status('HOU',3,[['0600','2200'],['0600','2200'],['0600','2200']])
 
 Airports = [AUS,DAL,HOU]
 
-t1 = Flight_Status('T1','AUS','0600')
-t2 = Flight_Status('T2','DAL','0600')
-t3 = Flight_Status('T3','DAL','0600')
-t4 = Flight_Status('T4','HOU','0600')
-t5 = Flight_Status('T5','HOU','0600')
-t6 = Flight_Status('T6','HOU','0600')
+t1 = Flight_Status('T1','AUS','0600',True)
+t2 = Flight_Status('T2','DAL','0600',True)
+t3 = Flight_Status('T3','DAL','0600',True)
+t4 = Flight_Status('T4','HOU','0600',True)
+t5 = Flight_Status('T5','HOU','0600',True)
+t6 = Flight_Status('T6','HOU','0600',True)
 
 Flights = [t4,t5,t6,t1,t2,t3]
 
@@ -104,6 +112,7 @@ def create_schedule(Flights,Airports):
 	while j>=0:
 		for fl in Flights:
 			fs = list()
+			fl.updated = False
 			for airport in Airports:
             	#print(airport.airportName)
 				if fl.currentAirport != airport.airportName:
@@ -116,11 +125,16 @@ def create_schedule(Flights,Airports):
 						update_Airport_Status(airport,i,fly_time)
 						#print(airport.gateStatus,airport.airportName)
 						update_flight_status(fl,airport.airportName,fly_time)
-						print(fl.tailNumber,fl.currentAirport,fl.time)
+						#print(fl.tailNumber,fl.currentAirport,fl.time)
 						break
 					#print(fs)
 			if len(fs)!=0:flt_schedule.append(fs)
-		j = j -1	
+			if fl.updated is False:
+				update_leftout_flight(fl)
+			#if fl.tailNumber == 'T3':print(fl.tailNumber,fl.currentAirport,fl.time)
+		'''for x in Flights:
+			if x.updated is False and x.tailNumber == 'T3' :print(x.tailNumber,x.currentAirport,x.time,x.updated)'''
+		j = j-1
     #print(flt_schedule)
 	print_flight_schedule(file_name, csv_header, flt_schedule)
 
