@@ -91,6 +91,13 @@ def update_leftout_flight(fl):
                                     2*CalculateGroundTime(fl.currentAirport))).rjust(4,'0')
 	fl.updated = True
 
+def check_allflight_status(Flights):
+	for x in Flights:
+		if int(x.time) >= 2200:
+			return False
+			break
+		else:return True
+
 AUS = Airport_Status('AUS',1,[['0600','2200']])
 DAL = Airport_Status('DAL',2,[['0600','2200'],['0600','2200']])
 HOU = Airport_Status('HOU',3,[['0600','2200'],['0600','2200'],['0600','2200']])
@@ -109,8 +116,7 @@ Flights = [t4,t5,t6,t1,t2,t3]
 flt_schedule = list()
 
 def create_flight_schedule(Flights,Airports):
-	j=14
-	while j>=0:
+	while check_allflight_status(Flights):
 		for fl in Flights:
 			fs = list()
 			fl.updated = False
@@ -130,13 +136,10 @@ def create_flight_schedule(Flights,Airports):
 						break
 					#print(fs)
 			if len(fs)!=0:flt_schedule.append(fs)
-			if fl.updated is False:
-				update_leftout_flight(fl)
+			if fl.updated is False:update_leftout_flight(fl)
 			#if fl.tailNumber == 'T3':print(fl.tailNumber,fl.currentAirport,fl.time)
 		'''for x in Flights:
 			if x.updated is False and x.tailNumber == 'T3' :print(x.tailNumber,x.currentAirport,x.time,x.updated)'''
-		j = j-1
-	
 	flt_schedule.sort(key=itemgetter(0,3))
 	#pprint.pprint(flt_schedule)
 	print_flight_schedule(file_name, csv_header, flt_schedule)
