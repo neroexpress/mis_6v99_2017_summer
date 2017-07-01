@@ -1,5 +1,8 @@
 #Code starts here
 
+import pprint
+from operator import itemgetter
+
 csv_header = 'tail_number,origin,destination,departure_time,arrival_time' 
 file_name = 'flight_schedule.csv'
 
@@ -133,7 +136,9 @@ def create_flight_schedule(Flights,Airports):
 		'''for x in Flights:
 			if x.updated is False and x.tailNumber == 'T3' :print(x.tailNumber,x.currentAirport,x.time,x.updated)'''
 		j = j-1
-    #print(flt_schedule)
+	
+	flt_schedule.sort(key=itemgetter(0,3))
+	pprint.pprint(flt_schedule)
 	print_flight_schedule(file_name, csv_header, flt_schedule)
 
 create_flight_schedule(Flights,Airports)
