@@ -138,7 +138,7 @@ def create_flight_schedule(Flights,Airports):
 		j = j-1
 	
 	flt_schedule.sort(key=itemgetter(0,3))
-	pprint.pprint(flt_schedule)
+	#pprint.pprint(flt_schedule)
 	print_flight_schedule(file_name, csv_header, flt_schedule)
 
 create_flight_schedule(Flights,Airports)
