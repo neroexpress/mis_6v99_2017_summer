@@ -60,7 +60,7 @@ def check_Availability(origin,destination,time,Airports):
     for port in Airports:
         if port.airportName == destination:
             for status in port.gateStatus:
-                if int(status[0]) <= time_available:
+                if int(status[0]) <= time_available and int(status[1]) >= time_available:
                     #return (True,i)
                     value = True
                     break
@@ -78,8 +78,8 @@ def update_Airport_Status(airport, i, fly_time):
 
 def update_flight_status(fl,airportName,fly_time):
     fl.currentAirport = airportName
-    fl.time = MilitaryTime(MinutesSinceMidnight(int(fly_time)) + \
-                                    CalculateGroundTime(airportName))
+    fl.time = str(MilitaryTime(MinutesSinceMidnight(int(fly_time)) + \
+                                    CalculateGroundTime(airportName))).rjust(4,'0')
     #print(fl.time)
 
 flt_schedule = list()
@@ -97,30 +97,32 @@ t4 = Flight_Status('T4','HOU','0600')
 t5 = Flight_Status('T5','HOU','0600')
 t6 = Flight_Status('T6','HOU','0600')
 
-Flights = [t1,t2,t3,t4,t5,t6]
-
+Flights = [t4,t5,t6,t1,t2,t3]
 
 def create_schedule(Flights,Airports):
-    for fl in Flights:
-        fs = list()
-        for airport in Airports:
-            #print(airport.airportName)
-            if fl.currentAirport != airport.airportName:
-                (value , i, fly_time) = check_Availability(fl.currentAirport,airport.airportName,fl.time,Airports)
-                #print(airport.gateStatus,airport.airportName)
-                #print(value , i, fly_time)
-                if value is True:
-                    fs.extend((fl.tailNumber,fl.currentAirport,airport.airportName,fl.time,fly_time))
-                    #print(airport.gateStatus,airport.airportName)
-                    update_Airport_Status(airport,i,fly_time)
-                    #print(airport.gateStatus,airport.airportName)
-                    update_flight_status(fl,airport.airportName,fly_time)
-                    #print(fl.tailNumber,fl.currentAirport,fl.time)
-                    break
-        #print(fs)
-        if len(fs)!=0:flt_schedule.append(fs)
-    print(flt_schedule)
-    print_flight_schedule(file_name, csv_header, flt_schedule)
+	j=14
+	while j>=0:
+		for fl in Flights:
+			fs = list()
+			for airport in Airports:
+            	#print(airport.airportName)
+				if fl.currentAirport != airport.airportName:
+					(value , i, fly_time) = check_Availability(fl.currentAirport,airport.airportName,fl.time,Airports)
+                	#print(airport.gateStatus,airport.airportName)
+                	#print(value , i, fly_time)
+					if value is True:
+						fs.extend((fl.tailNumber,fl.currentAirport,airport.airportName,fl.time,fly_time))
+                    	#print(airport.gateStatus,airport.airportName)
+						update_Airport_Status(airport,i,fly_time)
+						#print(airport.gateStatus,airport.airportName)
+						update_flight_status(fl,airport.airportName,fly_time)
+						print(fl.tailNumber,fl.currentAirport,fl.time)
+						break
+					#print(fs)
+			if len(fs)!=0:flt_schedule.append(fs)
+		j = j -1	
+    #print(flt_schedule)
+	print_flight_schedule(file_name, csv_header, flt_schedule)
 
 create_schedule(Flights,Airports)
 
