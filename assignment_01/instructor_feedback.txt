@@ -1,10 +1,22 @@
 
-2017-06-30 16:26 Friday
+2017-06-30 22:05 Friday
  Checking Directory: assignment_01 File: create_flight_schedule.py
 Assignment source code file found
 Assignment source code completed a run without a stack trace
 Please check instructor_stdout.txt for stdout (if any)
 Please check instructor_stderr.txt for stderr (if any)
 Attempting to read flight schedule file: flight_schedule.csv
-File not found
-Flight schedule file did not load and validate - 0 points
+[['T1', 'AUS', 'DAL', '0600', 360, '0650', 410], ['T2', 'DAL', 'AUS', '0600', 360, '0650', 410], ['T3', 'DAL', 'HOU', '0600', 360, '0705', 425], ['T4', 'HOU', 'DAL', '0600', 360, '0705', 425]]
+Flight schedule file loaded and validated - 5 points
+Noise restrictions validated - 5 points
+Flight times validated - 5 points
+['T1', 'AUS', '0000', 0, '0600', 360]
+ground time is 360
+['T2', 'DAL', '0000', 0, '0600', 360]
+ground time is 360
+['T3', 'DAL', '0000', 0, '0600', 360]
+ground time is 360
+['T4', 'HOU', '0000', 0, '0600', 360]
+ground time is 360
+Ground times validated - 5 points
+TBD - checking for too many aircraft on the group at an airport
