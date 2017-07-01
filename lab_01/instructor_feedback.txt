@@ -1,13 +1,9 @@
 
-2017-06-30 17:56 Friday
+2017-06-30 21:59 Friday
  Checking Directory: lab_01 File: print_flight_schedule.py
 Assignment source code file found
 Assignment source code completed a run without a stack trace
 Please check instructor_stdout.txt for stdout (if any)
 Please check instructor_stderr.txt for stderr (if any)
 Verifying that your flight_schedule.csv file matches the solution file
-Line does not matche the solution file
-Your line:  T3,HOU,DAL,0600,0705
-
-Solution line:  T3,DAL,HOU,0600,0705
-
+Your solution file matches!
