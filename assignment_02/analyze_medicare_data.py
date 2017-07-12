@@ -16,6 +16,7 @@ url = ('https://data.medicare.gov/views/bg9k-emty/files/'
 
 k_url = "http://kevincrook.com/utd/hospital_ranking_focus_status.xlsx"
 staging_dir_name = 'staging'
+db_name = "test.db"
 
 def get_Medicare_Hospital_Compare_Data(staging_dir_name,url):
 	r = requests.get(url)
@@ -57,9 +58,18 @@ def read_header(file_name):
 		headers = d_reader.fieldnames
 	return headers
 
+def create_sql_table(table_name,Column_list,db_name):
+	columns_tuple=tuple(Column_list)
+	sql_drop_str = 'drop table if exists ' + table_name
+	sql_create_str = 'create table if not exists ' + table_name  + str(columns_tuple)
+	conn = sqlite3.connect(db_name)
+	c1  =  conn.cursor()
+	c1.execute(sql_drop_str)
+	c1.execute(sql_create_str)
+	c1.close()
+
+
 glob_dir = os.path.join(staging_dir_name,"*.csv")
-conn = sqlite3.connect("test.db")
-c1  =  conn.cursor()
 
 for file_name in glob.glob(glob_dir):
 	print(file_name)
@@ -67,12 +77,14 @@ for file_name in glob.glob(glob_dir):
 	header = read_header(file_name)
 	#print("before: ",header)
 	table_name = transform_name(os.path.splitext(os.path.basename(file_name))[0],'table')
-	print("table_name: ",table_name)
+	#print("table_name: ",table_name)
 	Column_list = list()
 	for head in header:
 		head = transform_name(head,'column')
 		Column_list.append(head)
-	print("Column_list: ",Column_list)
+	#print("Column_list: ",Column_list)
+	create_sql_table(table_name,Column_list,db_name)
+	print("Table Created: ", table_name)
 	print("")
 	#print("  split extension: ",os.path.splitext(os.path.basename(file_name)))
     #print("  directory name: ", os.path.dirname(file_name))
@@ -121,17 +133,6 @@ openpyxl.__version__
 '''
 
 '''
-sql_str = "drop table if exists my_table"
-c1.execute(sql_str)
-
-sql_str = '''
-#create table if not exists my_table(
-#column_1 text,
-#column_2 text,
-#column_3 text)
-'''
-
-c1.execute(sql_str)
 
 sql_str = "insert into my_table(column_1,column_2,column_3) values(?,?,?)"
 sql_tuple = ('a','b','c')
