@@ -16,7 +16,7 @@ url = ('https://data.medicare.gov/views/bg9k-emty/files/'
 
 k_url = "http://kevincrook.com/utd/hospital_ranking_focus_status.xlsx"
 staging_dir_name = 'staging'
-db_name = "test.db"
+db_name = "medicare_hospital_compare.db"
 
 def get_Medicare_Hospital_Compare_Data(staging_dir_name,url):
 	r = requests.get(url)
@@ -55,8 +55,8 @@ def transform_name(file_name,tb):
 def read_header(file_name):
 	with open(file_name, "rt",encoding='cp1252') as f:
 		d_reader = csv.DictReader(f)
-		headers = d_reader.fieldnames
-	return headers
+		header = d_reader.fieldnames
+	return header
 
 def create_sql_table(table_name,Column_list,db_name):
 	columns_tuple=tuple(Column_list)
@@ -68,6 +68,22 @@ def create_sql_table(table_name,Column_list,db_name):
 	c1.execute(sql_create_str)
 	c1.close()
 
+def insert_values(file_name,table_name,Column_list,db_name):
+	columns_tuple=tuple(Column_list)
+	conn = sqlite3.connect(db_name)
+	c1  =  conn.cursor()
+	with open(file_name, "rt",encoding='cp1252') as f:
+		d_reader = csv.DictReader(f)
+		for line in d_reader:
+			sql_tuple = tuple([line[col] for col in d_reader.fieldnames])
+			blank = (sql_tuple.count(None) == len(sql_tuple)-1)
+			sql_str = 'insert into ' +  table_name + str(columns_tuple) + ' values'+ str(sql_tuple)
+			try:
+				if blank is not True:c1.execute(sql_str)
+			except Exception as e:
+				raise e
+	conn.commit()
+	c1.close()
 
 glob_dir = os.path.join(staging_dir_name,"*.csv")
 
@@ -85,11 +101,12 @@ for file_name in glob.glob(glob_dir):
 	#print("Column_list: ",Column_list)
 	create_sql_table(table_name,Column_list,db_name)
 	print("Table Created: ", table_name)
+	insert_values(file_name,table_name,Column_list,db_name)
+	print("Values inserted: ", table_name)
 	print("")
 	#print("  split extension: ",os.path.splitext(os.path.basename(file_name)))
     #print("  directory name: ", os.path.dirname(file_name))
     #print("  absolute path: ", os.path.abspath(file_name))
-
 
 
 '''
