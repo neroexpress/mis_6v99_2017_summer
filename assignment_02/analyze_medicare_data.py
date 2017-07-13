@@ -37,9 +37,6 @@ def get_House_Proprietary_Hospital_Rankings(k_url):
 	xf.write(r.content)
 	xf.close()
 
-#get_Medicare_Hospital_Compare_Data(staging_dir_name,url)
-#get_House_Proprietary_Hospital_Rankings(k_url)
-
 def transform_name(file_name,tb):
 	#print("Earlier: ",file_name)
 	file_name = file_name.lower()
@@ -85,28 +82,67 @@ def insert_values(file_name,table_name,Column_list,db_name):
 	conn.commit()
 	c1.close()
 
-glob_dir = os.path.join(staging_dir_name,"*.csv")
+def creat_sqlite_db(staging_dir_name,db_name):
+	glob_dir = os.path.join(staging_dir_name,"*.csv")
+	for file_name in glob.glob(glob_dir):
+		print(file_name)
+		#print("  basename:",os.path.basename(file_name))
+		header = read_header(file_name)
+		#print("before: ",header)
+		table_name = transform_name(os.path.splitext(os.path.basename(file_name))[0],'table')
+		#print("table_name: ",table_name)
+		Column_list = list()
+		for head in header:
+			head = transform_name(head,'column')
+			Column_list.append(head)
+		#print("Column_list: ",Column_list)
+		create_sql_table(table_name,Column_list,db_name)
+		print("Table Created: ", table_name)
+		insert_values(file_name,table_name,Column_list,db_name)
+		print("Values inserted: ", table_name)
+		print("")
+		#print("  split extension: ",os.path.splitext(os.path.basename(file_name)))
+	    #print("  directory name: ", os.path.dirname(file_name))
+	    #print("  absolute path: ", os.path.abspath(file_name))
 
-for file_name in glob.glob(glob_dir):
-	print(file_name)
-	#print("  basename:",os.path.basename(file_name))
-	header = read_header(file_name)
-	#print("before: ",header)
-	table_name = transform_name(os.path.splitext(os.path.basename(file_name))[0],'table')
-	#print("table_name: ",table_name)
-	Column_list = list()
-	for head in header:
-		head = transform_name(head,'column')
-		Column_list.append(head)
-	#print("Column_list: ",Column_list)
-	create_sql_table(table_name,Column_list,db_name)
-	print("Table Created: ", table_name)
-	insert_values(file_name,table_name,Column_list,db_name)
-	print("Values inserted: ", table_name)
-	print("")
-	#print("  split extension: ",os.path.splitext(os.path.basename(file_name)))
-    #print("  directory name: ", os.path.dirname(file_name))
-    #print("  absolute path: ", os.path.abspath(file_name))
+def check_if_number_of_rows_matches(staging_dir_name,db_name):
+	glob_dir = os.path.join(staging_dir_name,"*.csv")
+	for file_name in glob.glob(glob_dir):
+		with open(file_name, "rt",encoding='cp1252') as f:
+			reader = csv.reader(f,delimiter = ",")
+			data = list(reader)
+			row_count = len(data)
+			#print(row_count)
+		table_name = transform_name(os.path.splitext(os.path.basename(file_name))[0],'table')
+		conn = sqlite3.connect(db_name)
+		c1  =  conn.cursor()
+		sql_str = "select count(*) from " + table_name
+		rows = c1.execute(sql_str)
+		for row in rows:
+		    #print(row[0])
+		    pass
+		numberOfRowsIntable = row[0]
+		numberOfRowsInCSV = row_count-1
+		print("Table: {0}, CSV: {1}".format(numberOfRowsIntable,numberOfRowsInCSV))
+		if numberOfRowsIntable != numberOfRowsInCSV:
+			print("Rows not equal for CSV :{0}, Table: {1}".format(file_name,table_name))
+		else:print("Number of rows matches in CSV and Table")
+		print("")
+		c1.close()
+
+#get_Medicare_Hospital_Compare_Data(staging_dir_name,url)
+#get_House_Proprietary_Hospital_Rankings(k_url)
+#creat_sqlite_db(staging_dir_name,db_name)
+#check_if_number_of_rows_matches(staging_dir_name,db_name)
+
+
+
+
+
+
+
+
+
 
 
 '''
