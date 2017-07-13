@@ -130,14 +130,10 @@ def check_if_number_of_rows_matches(staging_dir_name,db_name):
 		print("")
 		c1.close()
 
-#get_Medicare_Hospital_Compare_Data(staging_dir_name,url)
-#get_House_Proprietary_Hospital_Rankings(k_url)
-#creat_sqlite_db(staging_dir_name,db_name)
+get_Medicare_Hospital_Compare_Data(staging_dir_name,url)
+get_House_Proprietary_Hospital_Rankings(k_url)
+creat_sqlite_db(staging_dir_name,db_name)
 #check_if_number_of_rows_matches(staging_dir_name,db_name)
-
-
-
-
 
 
 
