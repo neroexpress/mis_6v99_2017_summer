@@ -1,14 +1,6 @@
-import requests
-import pprint
-import os
-import zipfile
-import openpyxl
-import sqlite3
-import glob
-import getpass
-import fnmatch
-import re
-import csv
+import requests;import pprint;import os;import zipfile;import openpyxl
+import sqlite3;import glob;import getpass;import fnmatch;import re
+import csv;import pandas as pd; from operator import itemgetter
 
 url = ('https://data.medicare.gov/views/bg9k-emty/files/'
       '0a9879e0-3312-4719-a1db-39fd114890f1?content_type=application%2'
@@ -17,6 +9,9 @@ url = ('https://data.medicare.gov/views/bg9k-emty/files/'
 k_url = "http://kevincrook.com/utd/hospital_ranking_focus_status.xlsx"
 staging_dir_name = 'staging'
 db_name = "medicare_hospital_compare.db"
+Workbook = "hospital_ranking_focus_states.xlsx"
+ranking_worksheet = "Hospital National Ranking"
+Focus_states_worksheet = "Focus States"
 
 def get_Medicare_Hospital_Compare_Data(staging_dir_name,url):
 	r = requests.get(url)
@@ -133,121 +128,128 @@ def check_if_number_of_rows_matches(staging_dir_name,db_name):
 get_Medicare_Hospital_Compare_Data(staging_dir_name,url)
 get_House_Proprietary_Hospital_Rankings(k_url)
 creat_sqlite_db(staging_dir_name,db_name)
-#check_if_number_of_rows_matches(staging_dir_name,db_name)
+check_if_number_of_rows_matches(staging_dir_name,db_name)
+
+#--------------------------------------------------------------------------------
+#-------------------------Create Hospital Ranking Excel file --------------------
+#--------------------------------------------------------------------------------
+
+hospital_ranking_workbook  = 'hospital_ranking.xlsx'
+nationwide_worksheet = 'Nationwide'
+
+def get_top_100_providerID(Workbook,ranking_worksheet):
+	wb = openpyxl.load_workbook(Workbook)
+	sheet = wb.get_sheet_by_name(ranking_worksheet)
+	i= 1;j=0
+	top_100_provider_ID = list()
+	while sheet.cell(row=i,column=1).value != None and j <=100:
+		#print(sheet.cell(row=i,column=1).value, "|", sheet.cell(row=i,column=2).value)
+		top_100_provider_ID.append((sheet.cell(row=i,column=1).value,))
+		i +=1;j +=1
+	top_100_provider_ID = top_100_provider_ID[1::]
+	return top_100_provider_ID
+
+#top_100_provider_ID = get_top_100_providerID(Workbook,ranking_worksheet)
+#pprint.pprint(top_100_provider_ID)
+#print(len(top_100_provider_ID))
+
+def get_details_top_100_hospitals(db_name,top_100_provider_ID):
+	conn = sqlite3.connect(db_name)
+	c1  =  conn.cursor()
+	top_100_hospital_list = list()
+	for x in top_100_provider_ID:
+		sql_str = '''select provider_id, hospital_name,city,state,county_name 
+					 from hospital_general_information 
+					 Where provider_id = ?'''
+		sql_tuple = x
+		top_100_hospital_list.append(list(c1.execute(sql_str,sql_tuple).fetchone()))
+	return top_100_hospital_list
+
+top_100_hospital_detail = get_details_top_100_hospitals(db_name,get_top_100_providerID(Workbook,ranking_worksheet))
+#pprint.pprint(top_100_hospital_detail)
+#print(len(top_100_hospital_detail))
+
+def create_hospital_ranking_xlsx(hospital_ranking_workbook,nationwide_worksheet,top_100_hospital_detail):
+	wb2 = openpyxl.Workbook()
+	sheet_1 = wb2.create_sheet(nationwide_worksheet)
+	wb2.remove_sheet(wb2.get_sheet_by_name("Sheet"))
+	sheet_1.cell(row=1,column=1,value="Provider ID")
+	sheet_1.cell(row=1,column=2,value="Hospital Name")
+	sheet_1.cell(row=1,column=3,value="City")
+	sheet_1.cell(row=1,column=4,value="State")
+	sheet_1.cell(row=1,column=5,value="County")
+	for r_idx, row in enumerate(top_100_hospital_detail, 2):
+		for c_idx, value in enumerate(row, 1):
+			sheet_1.cell(row=r_idx, column=c_idx, value=value)
+	wb2.save(hospital_ranking_workbook)
+
+def get_list_of_states(Workbook,Focus_states_worksheet):
+	wb = openpyxl.load_workbook(Workbook)
+	sheet = wb.get_sheet_by_name(Focus_states_worksheet)
+	i= 1
+	list_of_Focus_states = list()
+	while sheet.cell(row=i,column=1).value != None:
+		list_of_Focus_states.append((sheet.cell(row=i,column=1).value,sheet.cell(row=i,column=2).value))
+		i +=1
+	list_of_Focus_states = list_of_Focus_states[1::]
+	return list_of_Focus_states
+
+#list_of_Focus_states = get_list_of_states(Workbook,Focus_states_worksheet)
+#pprint.pprint(list_of_Focus_states)
+
+def get_top_state_providerID_list(Workbook,ranking_worksheet,state_providerID_list):
+	wb = openpyxl.load_workbook(Workbook)
+	sheet = wb.get_sheet_by_name(ranking_worksheet)
+	providerID_of_Focus_states = list()
+	for x in state_providerID_list:
+		i= 1
+		while sheet.cell(row=i,column=1).value != None:
+			if sheet.cell(row=i,column=1).value == x:
+				providerID_of_Focus_states.append(list((sheet.cell(row=i,column=1).value,sheet.cell(row=i,column=2).value)))
+			i +=1
+	providerID_of_Focus_states.sort(key=itemgetter(1))
+	providerID_of_Focus_states = [(row[0],) for row in providerID_of_Focus_states[0:100:]]
+	#pprint.pprint(providerID_of_Focus_states)
+	#print(len(providerID_of_Focus_states))
+	return providerID_of_Focus_states
+
+def create_state_ranking_worksheet(hospital_ranking_workbook,statewide_worksheet,top_100_state_hospital_Detail):
+	wb3 = openpyxl.load_workbook(hospital_ranking_workbook)
+	sheet_1 = wb3.create_sheet(statewide_worksheet)
+	sheet_1.cell(row=1,column=1,value="Provider ID")
+	sheet_1.cell(row=1,column=2,value="Hospital Name")
+	sheet_1.cell(row=1,column=3,value="City")
+	sheet_1.cell(row=1,column=4,value="State")
+	sheet_1.cell(row=1,column=5,value="County")
+	for r_idx, row in enumerate(top_100_state_hospital_Detail, 2):
+		for c_idx, value in enumerate(row, 1):
+			sheet_1.cell(row=r_idx, column=c_idx, value=value)
+	wb3.save(hospital_ranking_workbook)
+
+def create_state_worksheets():
+	conn = sqlite3.connect(db_name)
+	c1  =  conn.cursor()
+	for x in get_list_of_states(Workbook,Focus_states_worksheet):
+		sql_str = '''select provider_id 
+					 from hospital_general_information 
+					 Where state = ?'''
+		sql_tuple = (x[1],)
+		#rows = c1.execute(sql_str,sql_tuple)
+		state_providerID_list = [row[0] for row in c1.execute(sql_str,sql_tuple)]
+		#print(x[0],len(state_providerID_list))
+		#pprint.pprint(state_providerID_list)
+		#print("")
+		top_100_state_providerID_list = get_top_state_providerID_list(Workbook,ranking_worksheet,state_providerID_list)
+		top_100_state_hospital_Detail = get_details_top_100_hospitals(db_name,top_100_state_providerID_list)
+		create_state_ranking_worksheet(hospital_ranking_workbook,x[0],top_100_state_hospital_Detail)
 
 
+create_hospital_ranking_xlsx(hospital_ranking_workbook,nationwide_worksheet,top_100_hospital_detail)
+create_state_worksheets()
 
-
-
-
-
-'''
-wb = openpyxl.load_workbook("hospital_ranking_focus_states.xlsx")
-
-for sheet_name in wb.get_sheet_names():
-    print(sheet_name)
-
-sheet = wb.get_sheet_by_name("Hospital National Ranking")
-
-i= 1
-while sheet.cell(row=i,column=1).value != None:
-    print(sheet.cell(row=i,column=1).value, "|", sheet.cell(row=i,column=2).value)
-    i +=1
-
-sheet = wb.get_sheet_by_name("Focus States")
-
-i= 1
-while sheet.cell(row=i,column=1).value != None:
-    print(sheet.cell(row=i,column=1).value, "|", sheet.cell(row=i,column=2).value)
-    i +=1
-
-wb2 = openpyxl.Workbook()
-
-sheet_1 = wb2.create_sheet("utd")
-
-sheet_1.cell(row=1,column=1,value="buan")
-
-for i in range(2,11):
-    sheet_1.cell(row=i,column=1,value=i-1)
-
-sheet_2 = wb2.create_sheet("test")
-sheet_2.cell(row=1,column=2,value="valued")
-
-wb2.remove_sheet(wb2.get_sheet_by_name("Sheet"))
-
-wb2.save("test.xlsx")
-
-openpyxl.__version__
-
-'''
-
-'''
-
-sql_str = "insert into my_table(column_1,column_2,column_3) values(?,?,?)"
-sql_tuple = ('a','b','c')
-c1.execute(sql_str,sql_tuple)
-
-conn.commit()
-
-sql_str= "select * from my_table"
-rows = c1.execute(sql_str)
-for row in rows:
-    print(row)
-
-sql_str = "select * from sqlite_master"
-rows = c1.execute(sql_str)
-for row in rows:
-    print(row)
-
-sql_str = "PRAGMA table_info('my_table')"
-rows = c1.execute(sql_str)
-for row in rows:
-    print(row)
-
-sql_str = "select * from sqlite_master where tbl_name = ?"
-sql_tuple = ('my_table',)
-c1.execute(sql_str,sql_tuple)
-for row in rows:
-    print(row)
-
-sql_str = "select count(*) from my_table"
-rows = c1.execute(sql_str)
-for row in rows:
-    print(row)
-
-#zip_file_name = os.path.join(staging_dir_name,"test.zip")
-
-#fn = "Timely and Effective Care - Hospital.csv"
-fn= os.path.join(staging_dir_name,"Timely and Effective Care - Hospital.csv")
-in_fp = open(fn,'rt',encoding='cp1252')
-input_data = in_fp.read()
-in_fp.close()
-
-ofn= os.path.join(staging_dir_name,"Timely and Effective Care - Hospital.csv")
-out_fp = open(ofn,'wt',encoding='utf-8')
-for c in input_data:
-    if c != '\0':
-        out_fp.write(c)
-out_fp.close()
-
-github_username = input("Enter your github username: ")
-
-github_password = getpass.getpass("enter your password")
-
-github_url = "https://api.github.com/user/repos"
-
-r = requests.get(github_url,auth=(github_username,github_password))
-
-r.status_code
-
-r.json()
-
-r.headers
-
-'''
-
-
-
+#-------------------------------------------------------------------------------
+#--------- Measures Statistical Analysis MS Excel Workbook----------------------
+#-------------------------------------------------------------------------------
 
 
 
