@@ -1,6 +1,7 @@
 import requests;import pprint;import os;import zipfile;import openpyxl
 import sqlite3;import glob;import getpass;import fnmatch;import re
 import csv;import pandas as pd; from operator import itemgetter
+import numpy as np
 
 url = ('https://data.medicare.gov/views/bg9k-emty/files/'
       '0a9879e0-3312-4719-a1db-39fd114890f1?content_type=application%2'
@@ -128,7 +129,7 @@ def check_if_number_of_rows_matches(staging_dir_name,db_name):
 get_Medicare_Hospital_Compare_Data(staging_dir_name,url)
 get_House_Proprietary_Hospital_Rankings(k_url)
 creat_sqlite_db(staging_dir_name,db_name)
-check_if_number_of_rows_matches(staging_dir_name,db_name)
+#check_if_number_of_rows_matches(staging_dir_name,db_name)
 
 #--------------------------------------------------------------------------------
 #-------------------------Create Hospital Ranking Excel file --------------------
@@ -251,8 +252,56 @@ create_state_worksheets()
 #--------- Measures Statistical Analysis MS Excel Workbook----------------------
 #-------------------------------------------------------------------------------
 
+measures_statistics_workbook = "measures_statistics.xlsx"
 
+def create_measures_statistics_xlsx(measures_statistics_workbook,nationwide_worksheet,measures_score_list):
+	wb1 = openpyxl.Workbook()
+	sheet_1 = wb1.create_sheet(nationwide_worksheet)
+	wb1.remove_sheet(wb1.get_sheet_by_name("Sheet"))
+	sheet_1.cell(row=1,column=1,value="Measure ID")
+	sheet_1.cell(row=1,column=2,value="Measure Name")
+	sheet_1.cell(row=1,column=3,value="Minimum")
+	sheet_1.cell(row=1,column=4,value="Maximum")
+	sheet_1.cell(row=1,column=5,value="Average")
+	sheet_1.cell(row=1,column=6,value="Standard Deviation")
+	for r_idx, row in enumerate(measures_score_list, 2):
+		for c_idx, value in enumerate(row, 1):
+			sheet_1.cell(row=r_idx, column=c_idx, value=value)
+	wb1.save(measures_statistics_workbook)
 
+def get_measures_score_list():
+	conn = sqlite3.connect(db_name)
+	c2  = conn.cursor()
+	sql_str = '''select measure_id,measure_name
+					from timely_and_effective_care___hospital
+					group by measure_id
+					order by measure_id'''
+	list_measure_id = [row for row in c2.execute(sql_str)]
+	measures_score_list = list()
+	for x in list_measure_id:
+		measure_list = list()
+		#pprint.pprint(x[0])
+		sql_str = '''select score
+					 from timely_and_effective_care___hospital
+					 where measure_id=?'''
+		sql_tuple = (x[0],)
+		top_100_hospital_list = [row[0] for row in c2.execute(sql_str,sql_tuple)]
+		#print(top_100_hospital_list)
+		#print("")
+		top_100_hospital_list = [int(s) for s in top_100_hospital_list if s.isdigit()]
+		#print(top_100_hospital_list)
+		if len(top_100_hospital_list) !=0 : 
+			myarray = np.asarray(top_100_hospital_list)
+			measure_list.extend((x[0],x[1],myarray.min(),myarray.max(),myarray.mean(),myarray.std()))
+			#print(measure_list)
+		else:
+			measure_list.extend((x[0],x[1],0,0,0,0))
+			#print("list is empty")
+		measures_score_list.append(measure_list)
+	#pprint.pprint(measures_score_list)
+	return measures_score_list
+
+create_measures_statistics_xlsx(measures_statistics_workbook,nationwide_worksheet,get_measures_score_list())
 
 
 
