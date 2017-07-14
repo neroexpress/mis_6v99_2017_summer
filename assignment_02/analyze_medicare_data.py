@@ -301,7 +301,58 @@ def get_measures_score_list():
 	#pprint.pprint(measures_score_list)
 	return measures_score_list
 
+def create_state_measures_worksheet(measures_statistics_workbook,statewide_worksheet,measures_score_list):
+	wb3 = openpyxl.load_workbook(measures_statistics_workbook)
+	sheet_1 = wb3.create_sheet(statewide_worksheet)
+	sheet_1.cell(row=1,column=1,value="Measure ID")
+	sheet_1.cell(row=1,column=2,value="Measure Name")
+	sheet_1.cell(row=1,column=3,value="Minimum")
+	sheet_1.cell(row=1,column=4,value="Maximum")
+	sheet_1.cell(row=1,column=5,value="Average")
+	sheet_1.cell(row=1,column=6,value="Standard Deviation")
+	for r_idx, row in enumerate(measures_score_list, 2):
+		for c_idx, value in enumerate(row, 1):
+			sheet_1.cell(row=r_idx, column=c_idx, value=value)
+	wb3.save(measures_statistics_workbook)
+
+def create_state_measures_worksheets():
+	for state in get_list_of_states(Workbook,Focus_states_worksheet):
+		conn = sqlite3.connect(db_name)
+		c2  = conn.cursor()
+		sql_str = '''select measure_id,measure_name
+						from timely_and_effective_care___hospital
+						group by measure_id
+						order by measure_id'''
+		list_measure_id = [row for row in c2.execute(sql_str)]
+		measures_score_list = list()
+		for x in list_measure_id:
+			measure_list = list()
+			#print(x[0],state[0])
+			sql_str = '''select score
+						 from timely_and_effective_care___hospital
+						 where measure_id=? and state=?'''
+			sql_tuple = (x[0],state[1])
+			score_list = [row[0] for row in c2.execute(sql_str,sql_tuple)]
+			#print(score_list)
+			#print("")
+			score_list = [int(s) for s in score_list if s.isdigit()]
+			#print(score_list)
+			if len(score_list) !=0 : 
+				myarray = np.asarray(score_list)
+				measure_list.extend((x[0],x[1],myarray.min(),myarray.max(),myarray.mean(),myarray.std()))
+				#print(measure_list)
+			else:
+				measure_list.extend((x[0],x[1],0,0,0,0))
+				#print("list is empty")
+			measures_score_list.append(measure_list)
+		#pprint.pprint(measures_score_list)
+		create_state_measures_worksheet(measures_statistics_workbook,state[0],measures_score_list)
+
+
 create_measures_statistics_xlsx(measures_statistics_workbook,nationwide_worksheet,get_measures_score_list())
+create_state_measures_worksheets()
+
+
 
 
 
