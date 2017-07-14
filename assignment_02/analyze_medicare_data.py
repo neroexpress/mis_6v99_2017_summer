@@ -39,9 +39,9 @@ def transform_name(file_name,tb):
 	file_name = re.sub(r'[\s\-\/]',"_",file_name)
 	file_name = re.sub(r'%',"pct",file_name)
 	if tb =='table':
-		file_name = re.sub(r'^[^a-zA-Z]+',"t_",file_name)
+		if  re.match(r'^[^a-zA-Z]+', file_name) is not None : file_name = "t_"+file_name
 	else:
-		file_name = re.sub(r'^[^a-zA-Z]+',"c_",file_name)
+		if  re.match(r'^[^a-zA-Z]+', file_name) is not None : file_name = "c_"+file_name
 	#print("Later: ",file_name)
 	return file_name
 
