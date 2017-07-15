@@ -1,15 +1,15 @@
 import numpy as np
 a = np.arange(15).reshape(3,5)
 
-#Print the array
-print(a)
-#Print the shape
-print(a.shape)
-#Print the size
-print(a.size)
-#Print the item size
-print(a.itemsize)
-#Print the number of dimensions
-print(a.size)
-#Print the data type name (not the data type)
-print(type(a.dtype))
+file_name = "demo_numpy.txt"
+
+list_of_values = list()
+list_of_values.extend((a,a.shape,a.size,a.itemsize,a.size,type(a.dtype)))
+
+def print_to_textfile(fn,list_of_values):
+	with open(fn,'wt') as f:
+		for s in list_of_values:
+			print(s)
+			print(s, file=f)
+
+print_to_textfile(file_name,list_of_values)
