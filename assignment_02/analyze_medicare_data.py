@@ -1,6 +1,6 @@
 import requests;import pprint;import os;import zipfile;import openpyxl
 import sqlite3;import glob;import getpass;import fnmatch;import re
-import csv;import pandas as pd; from operator import itemgetter
+import csv;import pandas as pd;from operator import itemgetter
 import numpy as np
 
 url = ('https://data.medicare.gov/views/bg9k-emty/files/'
@@ -15,6 +15,8 @@ ranking_worksheet = "Hospital National Ranking"
 Focus_states_worksheet = "Focus States"
 
 def get_Medicare_Hospital_Compare_Data(staging_dir_name,url):
+	#This function will download the Hospital compare data and will unzip the file
+	#into local staging directory
 	r = requests.get(url)
 	if (os.path.isdir(staging_dir_name)) is False:os.mkdir(staging_dir_name)
 	zip_file_name = os.path.join(staging_dir_name,"test.zip")
@@ -28,12 +30,15 @@ def get_Medicare_Hospital_Compare_Data(staging_dir_name,url):
 	#print(len(fnmatch.filter(os.listdir(staging_dir_name),'*.csv')))
 
 def get_House_Proprietary_Hospital_Rankings(k_url):
+	#This function will download the Hospital Ranking file.
 	r = requests.get(k_url)
 	xf = open("hospital_ranking_focus_states.xlsx","wb")
 	xf.write(r.content)
 	xf.close()
 
 def transform_name(file_name,tb):
+	#This function will transform the table and column name according to the
+	#requirements given.
 	#print("Earlier: ",file_name)
 	file_name = file_name.lower()
 	file_name = re.sub(r'[\s\-\/]',"_",file_name)
@@ -46,12 +51,15 @@ def transform_name(file_name,tb):
 	return file_name
 
 def read_header(file_name):
+	#This function will return header from the file.
 	with open(file_name, "rt",encoding='cp1252') as f:
 		d_reader = csv.DictReader(f)
 		header = d_reader.fieldnames
 	return header
 
 def create_sql_table(table_name,Column_list,db_name):
+	#This function will create the sqlite table. It accepts three parameters.
+	#Table name, column list and the DB name.
 	columns_tuple=tuple(Column_list)
 	sql_drop_str = 'drop table if exists ' + table_name
 	sql_create_str = 'create table if not exists ' + table_name  + str(columns_tuple)
@@ -62,6 +70,8 @@ def create_sql_table(table_name,Column_list,db_name):
 	c1.close()
 
 def insert_values(file_name,table_name,Column_list,db_name):
+	#This function will insert the data from csv files to sqlite database.
+	#This function accepts 3 parameters. File name, table name, column list, and the DB name
 	columns_tuple=tuple(Column_list)
 	conn = sqlite3.connect(db_name)
 	c1  =  conn.cursor()
@@ -79,6 +89,8 @@ def insert_values(file_name,table_name,Column_list,db_name):
 	c1.close()
 
 def creat_sqlite_db(staging_dir_name,db_name):
+	#This function creates the sqlite database. It accepts 3 parameter.
+	#The staging directory, database name
 	glob_dir = os.path.join(staging_dir_name,"*.csv")
 	for file_name in glob.glob(glob_dir):
 		print(file_name)
@@ -98,10 +110,12 @@ def creat_sqlite_db(staging_dir_name,db_name):
 		print("Values inserted: ", table_name)
 		print("")
 		#print("  split extension: ",os.path.splitext(os.path.basename(file_name)))
-	    #print("  directory name: ", os.path.dirname(file_name))
-	    #print("  absolute path: ", os.path.abspath(file_name))
+		#print("  directory name: ", os.path.dirname(file_name))
+		#print("  absolute path: ", os.path.abspath(file_name))
 
 def check_if_number_of_rows_matches(staging_dir_name,db_name):
+	#This fucntion is not necessary for code but this will insure that you have created
+	#the correct database and all the values are inserted properly into the DB
 	glob_dir = os.path.join(staging_dir_name,"*.csv")
 	for file_name in glob.glob(glob_dir):
 		with open(file_name, "rt",encoding='cp1252') as f:
@@ -139,6 +153,7 @@ hospital_ranking_workbook  = 'hospital_ranking.xlsx'
 nationwide_worksheet = 'Nationwide'
 
 def get_top_100_providerID(Workbook,ranking_worksheet):
+	#This function will get the top 100 provider IDs from the ranking worksheet
 	wb = openpyxl.load_workbook(Workbook)
 	sheet = wb.get_sheet_by_name(ranking_worksheet)
 	i= 1;j=0
@@ -155,6 +170,8 @@ def get_top_100_providerID(Workbook,ranking_worksheet):
 #print(len(top_100_provider_ID))
 
 def get_details_top_100_hospitals(db_name,top_100_provider_ID):
+	#This function will get the list of top 100 hospitals according to the top
+	#100 provider IDs passed to the function.
 	conn = sqlite3.connect(db_name)
 	c1  =  conn.cursor()
 	top_100_hospital_list = list()
@@ -171,6 +188,8 @@ top_100_hospital_detail = get_details_top_100_hospitals(db_name,get_top_100_prov
 #print(len(top_100_hospital_detail))
 
 def create_hospital_ranking_xlsx(hospital_ranking_workbook,nationwide_worksheet,top_100_hospital_detail):
+	#This function will create the workbook and the nationwide worksheet and fill the
+	#data of top 100 hospitals
 	wb2 = openpyxl.Workbook()
 	sheet_1 = wb2.create_sheet(nationwide_worksheet)
 	wb2.remove_sheet(wb2.get_sheet_by_name("Sheet"))
@@ -185,6 +204,7 @@ def create_hospital_ranking_xlsx(hospital_ranking_workbook,nationwide_worksheet,
 	wb2.save(hospital_ranking_workbook)
 
 def get_list_of_states(Workbook,Focus_states_worksheet):
+	#This function returns the list of focus states
 	wb = openpyxl.load_workbook(Workbook)
 	sheet = wb.get_sheet_by_name(Focus_states_worksheet)
 	i= 1
@@ -199,6 +219,8 @@ def get_list_of_states(Workbook,Focus_states_worksheet):
 #pprint.pprint(list_of_Focus_states)
 
 def get_top_state_providerID_list(Workbook,ranking_worksheet,state_providerID_list):
+	#This function will retrun the top 100 provider IDs for only a state that is passed
+	#into the function.
 	wb = openpyxl.load_workbook(Workbook)
 	sheet = wb.get_sheet_by_name(ranking_worksheet)
 	providerID_of_Focus_states = list()
@@ -215,6 +237,8 @@ def get_top_state_providerID_list(Workbook,ranking_worksheet,state_providerID_li
 	return providerID_of_Focus_states
 
 def create_state_ranking_worksheet(hospital_ranking_workbook,statewide_worksheet,top_100_state_hospital_Detail):
+	#This function creates the state ranking sheet for top 100 hospitals in that
+	#state only.
 	wb3 = openpyxl.load_workbook(hospital_ranking_workbook)
 	sheet_1 = wb3.create_sheet(statewide_worksheet)
 	sheet_1.cell(row=1,column=1,value="Provider ID")
@@ -228,6 +252,7 @@ def create_state_ranking_worksheet(hospital_ranking_workbook,statewide_worksheet
 	wb3.save(hospital_ranking_workbook)
 
 def create_state_worksheets():
+	#This will create and fill data into the state worksheets.
 	conn = sqlite3.connect(db_name)
 	c1  =  conn.cursor()
 	for x in get_list_of_states(Workbook,Focus_states_worksheet):
@@ -255,6 +280,7 @@ create_state_worksheets()
 measures_statistics_workbook = "measures_statistics.xlsx"
 
 def create_measures_statistics_xlsx(measures_statistics_workbook,nationwide_worksheet,measures_score_list):
+	#This function create the measure statistics excel file.
 	wb1 = openpyxl.Workbook()
 	sheet_1 = wb1.create_sheet(nationwide_worksheet)
 	wb1.remove_sheet(wb1.get_sheet_by_name("Sheet"))
@@ -270,6 +296,7 @@ def create_measures_statistics_xlsx(measures_statistics_workbook,nationwide_work
 	wb1.save(measures_statistics_workbook)
 
 def get_measures_score_list():
+	#This function will return the list of all the measure score_list.
 	conn = sqlite3.connect(db_name)
 	c2  = conn.cursor()
 	sql_str = '''select measure_id,measure_name
@@ -302,6 +329,8 @@ def get_measures_score_list():
 	return measures_score_list
 
 def create_state_measures_worksheet(measures_statistics_workbook,statewide_worksheet,measures_score_list):
+	#This function creates the excel worksheet for the all the states and enter the 
+	#scores data into the state worksheet
 	wb3 = openpyxl.load_workbook(measures_statistics_workbook)
 	sheet_1 = wb3.create_sheet(statewide_worksheet)
 	sheet_1.cell(row=1,column=1,value="Measure ID")
@@ -316,6 +345,7 @@ def create_state_measures_worksheet(measures_statistics_workbook,statewide_works
 	wb3.save(measures_statistics_workbook)
 
 def create_state_measures_worksheets():
+	#This function will call other functions to create the states measure sheets.
 	for state in get_list_of_states(Workbook,Focus_states_worksheet):
 		conn = sqlite3.connect(db_name)
 		c2  = conn.cursor()
@@ -348,11 +378,10 @@ def create_state_measures_worksheets():
 		#pprint.pprint(measures_score_list)
 		create_state_measures_worksheet(measures_statistics_workbook,state[0],measures_score_list)
 
-
 create_measures_statistics_xlsx(measures_statistics_workbook,nationwide_worksheet,get_measures_score_list())
 create_state_measures_worksheets()
 
-
+#End of the file
 
 
 
