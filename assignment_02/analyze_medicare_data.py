@@ -21,6 +21,7 @@ def get_Medicare_Hospital_Compare_Data(staging_dir_name,url):
 	if (os.path.isdir(staging_dir_name)) is False:os.mkdir(staging_dir_name)
 	zip_file_name = os.path.join(staging_dir_name,"test.zip")
 	zf = open(zip_file_name,'wb')
+	print(r.header)
 	zf.write(r.content)
 	zf.close()
 	z = zipfile.ZipFile(zip_file_name,'r')
@@ -304,6 +305,10 @@ def get_measures_score_list():
 					group by measure_id
 					order by measure_id'''
 	list_measure_id = [row for row in c2.execute(sql_str)]
+	#print(list_measure_id)
+	#print("")
+	list_measure_id =sorted(list_measure_id, key=lambda word: word[0].lower().replace("_", "a"))
+	#print(list_measure_id)
 	measures_score_list = list()
 	for x in list_measure_id:
 		measure_list = list()
@@ -354,6 +359,7 @@ def create_state_measures_worksheets():
 						group by measure_id
 						order by measure_id'''
 		list_measure_id = [row for row in c2.execute(sql_str)]
+		list_measure_id =sorted(list_measure_id, key=lambda word: word[0].lower().replace("_", "a"))
 		measures_score_list = list()
 		for x in list_measure_id:
 			measure_list = list()
