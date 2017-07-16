@@ -21,7 +21,6 @@ def get_Medicare_Hospital_Compare_Data(staging_dir_name,url):
 	if (os.path.isdir(staging_dir_name)) is False:os.mkdir(staging_dir_name)
 	zip_file_name = os.path.join(staging_dir_name,"test.zip")
 	zf = open(zip_file_name,'wb')
-	print(r.header)
 	zf.write(r.content)
 	zf.close()
 	z = zipfile.ZipFile(zip_file_name,'r')
