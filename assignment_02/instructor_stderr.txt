@@ -1,1 +1,6 @@
- 
+Traceback (most recent call last):
+  File "analyze_medicare_data.py", line 144, in <module>
+    get_Medicare_Hospital_Compare_Data(staging_dir_name,url)
+  File "analyze_medicare_data.py", line 24, in get_Medicare_Hospital_Compare_Data
+    print(r.header)
+AttributeError: 'Response' object has no attribute 'header'
