@@ -269,12 +269,13 @@ def create_state_worksheets():
 		top_100_state_hospital_Detail = get_details_top_100_hospitals(db_name,top_100_state_providerID_list)
 		create_state_ranking_worksheet(hospital_ranking_workbook,x[0],top_100_state_hospital_Detail)
 
-
+print("Creating Nationwide Hospital Ranking Workheet ...")
 create_hospital_ranking_xlsx(hospital_ranking_workbook,nationwide_worksheet,top_100_hospital_detail)
+print("Creating Statewise Hospital Ranking Workheet ...")
 create_state_worksheets()
 
 #-------------------------------------------------------------------------------
-#--------- Measures Statistical Analysis MS Excel Workbook----------------------
+#--------- Create Measures Statistical Analysis MS Excel Workbook----------------------
 #-------------------------------------------------------------------------------
 
 measures_statistics_workbook = "measures_statistics.xlsx"
@@ -326,7 +327,8 @@ def get_measures_score_list():
 			measure_list.extend((x[0],x[1],myarray.min(),myarray.max(),myarray.mean(),myarray.std()))
 			#print(measure_list)
 		else:
-			measure_list.extend((x[0],x[1],0,0,0,0))
+			if x[0]=='EDV':continue
+			else:measure_list.extend((x[0],x[1],0,0,0,0))
 			#print("list is empty")
 		measures_score_list.append(measure_list)
 	#pprint.pprint(measures_score_list)
@@ -372,18 +374,21 @@ def create_state_measures_worksheets():
 			#print("")
 			score_list = [int(s) for s in score_list if s.isdigit()]
 			#print(score_list)
-			if len(score_list) !=0 : 
+			if len(score_list) !=0: 
 				myarray = np.asarray(score_list)
 				measure_list.extend((x[0],x[1],myarray.min(),myarray.max(),myarray.mean(),myarray.std()))
 				#print(measure_list)
 			else:
-				measure_list.extend((x[0],x[1],0,0,0,0))
+				if x[0]=='EDV':continue
+				else:measure_list.extend((x[0],x[1],0,0,0,0))
 				#print("list is empty")
 			measures_score_list.append(measure_list)
 		#pprint.pprint(measures_score_list)
 		create_state_measures_worksheet(measures_statistics_workbook,state[0],measures_score_list)
 
+print("Creating Nationwide Hospital measure Workheet ...")
 create_measures_statistics_xlsx(measures_statistics_workbook,nationwide_worksheet,get_measures_score_list())
+print("Creating Statewise Hospital measure Workheet ...")
 create_state_measures_worksheets()
 
 #End of the file
