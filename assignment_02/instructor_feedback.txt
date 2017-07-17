@@ -1,7 +1,59 @@
 
-2017-07-16 07:08 Sunday
+2017-07-17 08:55 Monday
  Checking Directory: assignment_02 File: analyze_medicare_data.py
 Assignment source code file found
-Assignment source code was run and generated a stack trace
+Assignment source code completed a run without a stack trace
 Please check instructor_stdout.txt for stdout (if any)
 Please check instructor_stderr.txt for stderr (if any)
+Successful run of program without stack trace = 5 points
+Documentation ratio of soufce code to comments no more than 5 to 1 = 5 points
+sqlite3 database: medicare_hospital_compare.db correctly created = 5 points
+All csv files in the Medicare hospital compare database have a staging table = 5 points
+All staging tables have all columns in the corresponding csv file = 5 points
+All data from all csv files correctly loaded into staging tables = 10 points
+Hospital Ranking excel file: hospital_ranking.xlsx correctly created = 10 points
+Sheet: Nationwide Row: 4 Column: 1 Value: EDV should be IMM_2
+Sheet: Nationwide Row: 4 Column: 2 Value: Emergency department volume should be Immunization for influenza
+Sheet: Nationwide Row: 5 Column: 1 Value: IMM_2 should be IMM_3_OP_27_FAC_ADHPCT
+Sheet: Nationwide Row: 5 Column: 2 Value: Immunization for influenza should be Healthcare workers given influenza vaccination
+Sheet: California Row: 4 Column: 1 Value: EDV should be IMM_2
+Sheet: California Row: 4 Column: 2 Value: Emergency department volume should be Immunization for influenza
+Sheet: California Row: 5 Column: 1 Value: IMM_2 should be IMM_3_OP_27_FAC_ADHPCT
+Sheet: California Row: 5 Column: 2 Value: Immunization for influenza should be Healthcare workers given influenza vaccination
+Sheet: Florida Row: 4 Column: 1 Value: EDV should be IMM_2
+Sheet: Florida Row: 4 Column: 2 Value: Emergency department volume should be Immunization for influenza
+Sheet: Florida Row: 5 Column: 1 Value: IMM_2 should be IMM_3_OP_27_FAC_ADHPCT
+Sheet: Florida Row: 5 Column: 2 Value: Immunization for influenza should be Healthcare workers given influenza vaccination
+Sheet: Georgia Row: 4 Column: 1 Value: EDV should be IMM_2
+Sheet: Georgia Row: 4 Column: 2 Value: Emergency department volume should be Immunization for influenza
+Sheet: Georgia Row: 5 Column: 1 Value: IMM_2 should be IMM_3_OP_27_FAC_ADHPCT
+Sheet: Georgia Row: 5 Column: 2 Value: Immunization for influenza should be Healthcare workers given influenza vaccination
+Sheet: Illinois Row: 4 Column: 1 Value: EDV should be IMM_2
+Sheet: Illinois Row: 4 Column: 2 Value: Emergency department volume should be Immunization for influenza
+Sheet: Illinois Row: 5 Column: 1 Value: IMM_2 should be IMM_3_OP_27_FAC_ADHPCT
+Sheet: Illinois Row: 5 Column: 2 Value: Immunization for influenza should be Healthcare workers given influenza vaccination
+Sheet: Kansas Row: 4 Column: 1 Value: EDV should be IMM_2
+Sheet: Kansas Row: 4 Column: 2 Value: Emergency department volume should be Immunization for influenza
+Sheet: Kansas Row: 5 Column: 1 Value: IMM_2 should be IMM_3_OP_27_FAC_ADHPCT
+Sheet: Kansas Row: 5 Column: 2 Value: Immunization for influenza should be Healthcare workers given influenza vaccination
+Sheet: Michigan Row: 4 Column: 1 Value: EDV should be IMM_2
+Sheet: Michigan Row: 4 Column: 2 Value: Emergency department volume should be Immunization for influenza
+Sheet: Michigan Row: 5 Column: 1 Value: IMM_2 should be IMM_3_OP_27_FAC_ADHPCT
+Sheet: Michigan Row: 5 Column: 2 Value: Immunization for influenza should be Healthcare workers given influenza vaccination
+Sheet: New York Row: 4 Column: 1 Value: EDV should be IMM_2
+Sheet: New York Row: 4 Column: 2 Value: Emergency department volume should be Immunization for influenza
+Sheet: New York Row: 5 Column: 1 Value: IMM_2 should be IMM_3_OP_27_FAC_ADHPCT
+Sheet: New York Row: 5 Column: 2 Value: Immunization for influenza should be Healthcare workers given influenza vaccination
+Sheet: Ohio Row: 4 Column: 1 Value: EDV should be IMM_2
+Sheet: Ohio Row: 4 Column: 2 Value: Emergency department volume should be Immunization for influenza
+Sheet: Ohio Row: 5 Column: 1 Value: IMM_2 should be IMM_3_OP_27_FAC_ADHPCT
+Sheet: Ohio Row: 5 Column: 2 Value: Immunization for influenza should be Healthcare workers given influenza vaccination
+Sheet: Pennsylvania Row: 4 Column: 1 Value: EDV should be IMM_2
+Sheet: Pennsylvania Row: 4 Column: 2 Value: Emergency department volume should be Immunization for influenza
+Sheet: Pennsylvania Row: 5 Column: 1 Value: IMM_2 should be IMM_3_OP_27_FAC_ADHPCT
+Sheet: Pennsylvania Row: 5 Column: 2 Value: Immunization for influenza should be Healthcare workers given influenza vaccination
+Sheet: Texas Row: 4 Column: 1 Value: EDV should be IMM_2
+Sheet: Texas Row: 4 Column: 2 Value: Emergency department volume should be Immunization for influenza
+Sheet: Texas Row: 5 Column: 1 Value: IMM_2 should be IMM_3_OP_27_FAC_ADHPCT
+Sheet: Texas Row: 5 Column: 2 Value: Immunization for influenza should be Healthcare workers given influenza vaccination
+Measures Statistics excel file: measures_statistics.xlsx not correctly created = 0 points
