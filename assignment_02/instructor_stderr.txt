@@ -1,6 +1,1 @@
-Traceback (most recent call last):
-  File "analyze_medicare_data.py", line 143, in <module>
-    #Extract data from medicare_hospital_compare database 
-  File "analyze_medicare_data.py", line 21, in get_Medicare_Hospital_Compare_Data
-    #check if directory exists
-FileNotFoundError: [Errno 2] No such file or directory: 'staging'
+ 
