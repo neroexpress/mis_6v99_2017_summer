@@ -33,8 +33,10 @@ def get_valid_four_digitlist(product_list):
 #get_training_set(training_url,training_file)
 #get_test_data(test_url,test_file)
 
-#fourdigit_productlist = get_valid_four_digitlist(product_list)
+fourdigit_productlist = get_valid_four_digitlist(product_list)
 
+d = dict.fromkeys(fourdigit_productlist, 0)
+pprint.pprint(d)
 
 
 
