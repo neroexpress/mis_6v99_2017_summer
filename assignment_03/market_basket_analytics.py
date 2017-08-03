@@ -68,19 +68,19 @@ test_productlist=get_test_list(test_file)
 #pprint.pprint(test_productlist[:10:])
 
 transaction_productlist_count = Counter(transaction_productlist)
+#pprint.pprint(transaction_productlist_count)
 
 def print_suggested_product(fn, prod_list):
     with open(fn,'wt') as f:
         for s in prod_list:
             print(','.join(s), file=f)
 
-
 def get_suggested_tuple(list_val):
 	counts = list()
 	for x in list_val:
 		counts.append((x,transaction_productlist_count[x]))
 	sorted_counts = sorted(counts, key=lambda tup: tup[1])
-	#print(sorted_counts)
+	#pprint.pprint(sorted_counts)
 	return sorted_counts[-1]
 
 def get_suggested_product(actual_prod,suggested_tuple):
@@ -97,10 +97,12 @@ suggested_product_list = list()
 product_number = 1
 for i in test_productlist:
 	list_val = list()
+	#print(i)
 	j = i.split(' ')
-	product_list_local = [x for x in product_list if x not in j]
-	for x in product_list_local:
-		list_val.append(i+' '+x)
+	k = [ix for ix in j if ix not in ['P04','P08']]
+	#print(' '.join(k))
+	product_list_local = [x for x in product_list if x not in k]
+	list_val = [' '.join(k)+' '+x_val for x_val in product_list_local]
 	#print(list_val)
 	arranged_list = [' '.join(sorted(x.split(' '))) for x in list_val]
 	#print(arranged_list)
