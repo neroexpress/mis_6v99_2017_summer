@@ -86,3 +86,8 @@ print_twitter_analytics(twitter_anaytics_file,list_twitter_analytics)
 #-------------------------------------------------------------------------------------------
 
 
+with open(Tweet_texts_file,'wt') as f:
+	for x in json_data:
+		if 'text' in x.keys():
+			print(x['text'],file=f)
+
