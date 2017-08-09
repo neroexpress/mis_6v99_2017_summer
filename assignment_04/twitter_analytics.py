@@ -1,7 +1,7 @@
 # The code starts from here.
 
 import requests; from itertools import combinations; from pprint import pprint
-from collections import Counter; import json; import operator
+from collections import Counter; import json; import operator;import codecs
 
 JSON_file_url  = "http://kevincrook.com/utd/tweets.json"
 JSON_file= "tweets_json_file.json"
@@ -69,7 +69,8 @@ def print_twitter_analytics(fn,list_value):
 				print(s,file=f)
 			else:
 				for x in s:
-					print(x[0],x[1], file=f)
+					li = [x[0],str(x[1])]
+					print(','.join(li), file=f)
 
 download_JSON_file(JSON_file_url,JSON_file)
 json_data = read_json_file(JSON_file)
@@ -86,8 +87,10 @@ print_twitter_analytics(twitter_anaytics_file,list_twitter_analytics)
 #-------------------------------------------------------------------------------------------
 
 
-with open(Tweet_texts_file,'wt') as f:
+with codecs.open(Tweet_texts_file,'w',encoding='utf8') as f:
 	for x in json_data:
 		if 'text' in x.keys():
-			print(x['text'],file=f)
+			f.write(x['text'])
+
+
 
