@@ -90,7 +90,7 @@ def print_twitter_analytics(fn,list_value):
 
 download_JSON_file(JSON_file_url,JSON_file)
 json_data = read_json_file(JSON_file)
-#pprint(json_data[7])
+#pprint(json_data[1])
 
 list_twitter_analytics = get_twitter_analytics_list(get_total_number_of_events(json_data),
 							get_total_number_of_tweets(json_data),
@@ -112,7 +112,7 @@ with codecs.open(Tweet_texts_file,'w',encoding='utf8') as f:
 			#print("------------------------TOP-------------------------------------")
 			#print(x['text'])
 			#print("------------------------Below-------------------------------------")
-			f.write(x['text'])
+			print(x['text'],file=f)
 
 
 
